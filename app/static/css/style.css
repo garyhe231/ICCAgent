@@ -255,22 +255,60 @@ input[type="text"]::placeholder, textarea::placeholder {
   box-shadow: 0 8px 24px rgba(0,0,0,0.4);
 }
 .lane-dropdown-menu.open { display: block; }
+
+.lane-group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px 6px;
+  background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+}
+.lane-group-name {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+}
+.lane-group-label {
+  font-size: 11px;
+  color: var(--text-muted);
+  flex: 1;
+}
+.lane-group-all {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+  background: none;
+  border: 1px solid var(--accent);
+  border-radius: 4px;
+  padding: 1px 7px;
+  cursor: pointer;
+  opacity: 0.7;
+}
+.lane-group-all:hover { opacity: 1; }
+
 .lane-option {
   display: flex;
-  flex-direction: column;
-  gap: 3px;
-  padding: 12px 14px;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 14px;
   cursor: pointer;
   border-bottom: 1px solid var(--border);
   transition: background 0.12s;
 }
 .lane-option:last-child { border-bottom: none; }
 .lane-option:hover { background: var(--surface2); }
-.lane-option input { display: none; }
-.lane-option:has(input:checked) { background: rgba(79,126,247,0.08); }
-.lane-option strong { font-size: 13px; color: var(--text); display: flex; align-items: center; gap: 8px; }
-.lane-option:has(input:checked) strong { color: var(--accent); }
-.lane-option:has(input:checked) strong::before { content: '✓'; font-size: 11px; color: var(--accent); }
+.lane-option input { accent-color: var(--accent); cursor: pointer; flex-shrink: 0; }
+.lane-option:has(input:checked) { background: rgba(79,126,247,0.07); }
+.lane-option-text { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.lane-origin { color: var(--text); font-weight: 500; }
+.lane-arrow { color: var(--text-muted); font-size: 11px; }
+.lane-dest { color: var(--accent); font-weight: 600; }
+.lane-option:has(input:checked) .lane-origin { color: var(--text); }
 .lane-sub { font-size: 11px; font-weight: 400; color: var(--text-muted); }
 .lane-ports { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
 

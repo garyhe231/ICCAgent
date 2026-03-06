@@ -8,14 +8,30 @@ function toggleLaneDropdown() {
 }
 
 function updateLaneLabel() {
-  const checked = Array.from(document.querySelectorAll('input[name="lane"]:checked'));
+  const checked = Array.from(document.querySelectorAll('input[name="port_pair"]:checked'));
   const label = document.getElementById('lane-dropdown-label');
   if (checked.length === 0) {
-    label.textContent = 'Select trade lanes…';
+    label.textContent = 'Select port pairs…';
   } else {
-    const names = { TPEB: 'Trans-Pacific EB', FEWB: 'Far East WB' };
-    label.textContent = checked.map(el => `${el.value} — ${names[el.value]}`).join(', ');
+    // Group by lane for compact label
+    const byLane = {};
+    checked.forEach(el => {
+      const [lane, origin, dest] = el.value.split('|');
+      if (!byLane[lane]) byLane[lane] = [];
+      byLane[lane].push(dest);
+    });
+    label.textContent = Object.entries(byLane)
+      .map(([lane, dests]) => `${lane}: ${dests.join(', ')}`)
+      .join(' · ');
   }
+}
+
+function selectAllInGroup(laneKey, event) {
+  event.stopPropagation();
+  const checkboxes = document.querySelectorAll(`input[name="port_pair"][data-lane="${laneKey}"]`);
+  const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+  checkboxes.forEach(cb => cb.checked = !allChecked);
+  updateLaneLabel();
 }
 
 // Close dropdown when clicking outside
@@ -33,13 +49,20 @@ async function triggerRun() {
   const btnText = document.getElementById('run-btn-text');
   const status = document.getElementById('run-status');
   const extraContext = document.getElementById('extra-context').value.trim();
-  const lanes = Array.from(document.querySelectorAll('input[name="lane"]:checked')).map(el => el.value);
+  const checkedPairs = Array.from(document.querySelectorAll('input[name="port_pair"]:checked'));
 
-  if (lanes.length === 0) {
+  if (checkedPairs.length === 0) {
     status.className = 'run-status err';
-    status.textContent = 'Select at least one trade lane.';
+    status.textContent = 'Select at least one port pair.';
     return;
   }
+
+  // Derive unique trade lanes from selected port pairs
+  const lanes = [...new Set(checkedPairs.map(el => el.value.split('|')[0]))];
+  const portPairs = checkedPairs.map(el => {
+    const [lane, origin, dest] = el.value.split('|');
+    return { lane, origin, dest };
+  });
 
   btn.disabled = true;
   btnText.textContent = 'Running agent…';
@@ -50,7 +73,7 @@ async function triggerRun() {
     const res = await fetch('/api/run', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ extra_context: extraContext, trigger: 'manual', trade_lanes: lanes }),
+      body: JSON.stringify({ extra_context: extraContext, trigger: 'manual', trade_lanes: lanes, port_pairs: portPairs }),
     });
     const data = await res.json();
 

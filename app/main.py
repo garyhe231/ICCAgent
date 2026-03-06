@@ -44,12 +44,14 @@ app.mount("/static", StaticFiles(directory=os.path.join(_dir, "static")), name="
 
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):
+    from app.config import TRADE_LANES
     runs = get_all_runs()
     signals = get_qualitative_signals()
     latest = runs[0] if runs else None
     return templates.TemplateResponse("dashboard.html", {
         "request": request,
         "runs": runs,
+        "trade_lanes": TRADE_LANES,
         "signals": signals,
         "latest": latest,
     })

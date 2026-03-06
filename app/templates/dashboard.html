@@ -29,15 +29,26 @@
         <h2 class="panel-title">Run Agent</h2>
         <p class="panel-desc">Trigger a fresh ICC analysis. The agent will ingest all available signals and produce a briefing document.</p>
         <div class="lane-selector">
-          <label class="lane-label">Trade Lanes</label>
+          <label class="lane-label">Port Pairs</label>
           <div class="lane-dropdown-wrap" id="lane-dropdown-wrap">
             <button type="button" class="lane-dropdown-btn" id="lane-dropdown-btn" onclick="toggleLaneDropdown()">
-              <span id="lane-dropdown-label">TPEB — Trans-Pacific EB</span>
+              <span id="lane-dropdown-label">Select port pairs…</span>
               <span class="lane-dropdown-arrow">&#9660;</span>
             </button>
             <div class="lane-dropdown-menu" id="lane-dropdown-menu">
-              <label class="lane-option"><input type="checkbox" name="lane" value="TPEB" checked onchange="updateLaneLabel()"> <strong>TPEB</strong> <span class="lane-sub">Trans-Pacific Eastbound</span><div class="lane-ports">China / SEA &rarr; PSW, PNW, EC, Gulf</div></label>
-              <label class="lane-option"><input type="checkbox" name="lane" value="FEWB" onchange="updateLaneLabel()"> <strong>FEWB</strong> <span class="lane-sub">Far East Westbound</span><div class="lane-ports">China / SEA / NEA &rarr; North Europe, Med</div></label>
+              {% for lane_key, lane in trade_lanes.items() %}
+              <div class="lane-group-header">
+                <span class="lane-group-name">{{ lane_key }}</span>
+                <span class="lane-group-label">{{ lane.label }}</span>
+                <button type="button" class="lane-group-all" onclick="selectAllInGroup('{{ lane_key }}', event)">All</button>
+              </div>
+              {% for origin, dest in lane.port_pairs %}
+              <label class="lane-option">
+                <input type="checkbox" name="port_pair" value="{{ lane_key }}|{{ origin }}|{{ dest }}" data-lane="{{ lane_key }}" onchange="updateLaneLabel()">
+                <span class="lane-option-text"><span class="lane-origin">{{ origin }}</span> <span class="lane-arrow">&rarr;</span> <span class="lane-dest">{{ dest }}</span></span>
+              </label>
+              {% endfor %}
+              {% endfor %}
             </div>
           </div>
         </div>
