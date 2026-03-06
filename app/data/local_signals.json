@@ -1,0 +1,49 @@
+{
+  "_note": "Phase 0 local seed data — replaced by live Snowflake data in Phase 1",
+  "as_of": "2026-03-03",
+  "weighted_buy": {
+    "source": "Snowflake / Cost Library (Phase 0: local seed)",
+    "data": [
+      {"origin": "China Base Ports", "destination": "PSW",  "equipment": "40ft", "rate_usd": 2340, "carrier": "AVERAGE", "week": "2026-W09"},
+      {"origin": "China Base Ports", "destination": "PNW",  "equipment": "40ft", "rate_usd": 2180, "carrier": "AVERAGE", "week": "2026-W09"},
+      {"origin": "China Base Ports", "destination": "EC",   "equipment": "40ft", "rate_usd": 3650, "carrier": "AVERAGE", "week": "2026-W09"},
+      {"origin": "China Base Ports", "destination": "Gulf", "equipment": "40ft", "rate_usd": 3520, "carrier": "AVERAGE", "week": "2026-W09"},
+      {"origin": "SEA",              "destination": "PSW",  "equipment": "40ft", "rate_usd": 2050, "carrier": "AVERAGE", "week": "2026-W09"},
+      {"origin": "SEA",              "destination": "EC",   "equipment": "40ft", "rate_usd": 3400, "carrier": "AVERAGE", "week": "2026-W09"}
+    ]
+  },
+  "volume_allocation": {
+    "source": "Looker / Snowflake (Phase 0: local seed)",
+    "data": [
+      {"carrier": "Maersk",   "share_pct": 28, "trend": "stable"},
+      {"carrier": "MSC",      "share_pct": 22, "trend": "growing"},
+      {"carrier": "ONE",      "share_pct": 18, "trend": "stable"},
+      {"carrier": "Evergreen","share_pct": 14, "trend": "declining"},
+      {"carrier": "CMA CGM",  "share_pct": 12, "trend": "growing"},
+      {"carrier": "Other",    "share_pct":  6, "trend": "stable"}
+    ]
+  },
+  "qualitative_signals": {
+    "source": "Procurement team (Phase 0: pre-loaded examples)",
+    "entries": [
+      {
+        "timestamp": "2026-03-03T09:00:00Z",
+        "author": "Procurement",
+        "text": "Maersk indicated they will hold rates firm through end of March. No GRI planned before April.",
+        "tags": ["carrier-intel", "Maersk", "GRI"]
+      },
+      {
+        "timestamp": "2026-03-02T14:30:00Z",
+        "author": "Procurement",
+        "text": "MSC is being aggressive on FAK to PSW — seeing indicative offers $200 below market.",
+        "tags": ["carrier-intel", "MSC", "PSW", "FAK"]
+      },
+      {
+        "timestamp": "2026-03-01T11:00:00Z",
+        "author": "AE",
+        "text": "Customer forwarded Kuehne+Nagel quote for China-PSW at $2,100/40ft FAK.",
+        "tags": ["competitor-rate", "KN", "PSW"]
+      }
+    ]
+  }
+}

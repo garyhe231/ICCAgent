@@ -1,0 +1,48 @@
+{
+  "_note": "Phase 0 local seed data for FEWB — replaced by live Snowflake data in Phase 1",
+  "as_of": "2026-03-03",
+  "weighted_buy": {
+    "source": "Snowflake / Cost Library (Phase 0: local seed)",
+    "data": [
+      {"origin": "China Base Ports", "destination": "North Europe", "equipment": "40ft", "rate_usd": 2850, "carrier": "AVERAGE", "week": "2026-W09"},
+      {"origin": "China Base Ports", "destination": "Med",          "equipment": "40ft", "rate_usd": 2650, "carrier": "AVERAGE", "week": "2026-W09"},
+      {"origin": "SEA",              "destination": "North Europe", "equipment": "40ft", "rate_usd": 2600, "carrier": "AVERAGE", "week": "2026-W09"},
+      {"origin": "SEA",              "destination": "Med",          "equipment": "40ft", "rate_usd": 2400, "carrier": "AVERAGE", "week": "2026-W09"},
+      {"origin": "NEA",              "destination": "North Europe", "equipment": "40ft", "rate_usd": 2750, "carrier": "AVERAGE", "week": "2026-W09"}
+    ]
+  },
+  "volume_allocation": {
+    "source": "Looker / Snowflake (Phase 0: local seed)",
+    "data": [
+      {"carrier": "Maersk",      "share_pct": 24, "trend": "stable"},
+      {"carrier": "MSC",         "share_pct": 20, "trend": "growing"},
+      {"carrier": "CMA CGM",     "share_pct": 19, "trend": "stable"},
+      {"carrier": "Hapag-Lloyd", "share_pct": 16, "trend": "growing"},
+      {"carrier": "Evergreen",   "share_pct": 11, "trend": "declining"},
+      {"carrier": "Other",       "share_pct": 10, "trend": "stable"}
+    ]
+  },
+  "qualitative_signals": {
+    "source": "Procurement team (Phase 0: pre-loaded examples)",
+    "entries": [
+      {
+        "timestamp": "2026-03-03T10:00:00Z",
+        "author": "Procurement",
+        "text": "CMA CGM announced a GRI of $200/40ft effective April 1 on FE-North Europe. Historical pass-through rate on this carrier is ~60%.",
+        "tags": ["carrier-intel", "CMA CGM", "GRI", "North Europe"]
+      },
+      {
+        "timestamp": "2026-03-02T09:00:00Z",
+        "author": "Procurement",
+        "text": "Hapag-Lloyd offering competitive FAK to North Europe at $2,600/40ft — below current market. Volume-dependent.",
+        "tags": ["carrier-intel", "Hapag-Lloyd", "FAK", "North Europe"]
+      },
+      {
+        "timestamp": "2026-03-01T14:00:00Z",
+        "author": "AE",
+        "text": "Customer shared Kuehne+Nagel rate for China-North Europe at $2,750/40ft FAK.",
+        "tags": ["competitor-rate", "KN", "North Europe"]
+      }
+    ]
+  }
+}

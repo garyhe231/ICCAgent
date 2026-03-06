@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ICC AI Agent — TPEB</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <div class="brand">
+        <span class="brand-label">ICC AI Agent</span>
+        <span class="brand-lane">TPEB &mdash; China / SEA &rarr; PSW, PNW, EC, Gulf</span>
+      </div>
+      <div class="top-bar-meta">
+        <span class="phase-badge">Phase 0 &mdash; Demo</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="layout">
+
+    <!-- Left panel: controls + signal intake -->
+    <aside class="sidebar">
+
+      <!-- Run trigger -->
+      <section class="panel">
+        <h2 class="panel-title">Run Agent</h2>
+        <p class="panel-desc">Trigger a fresh ICC analysis. The agent will ingest all available signals and produce a briefing document.</p>
+        <div class="lane-selector">
+          <label class="lane-label">Trade Lanes</label>
+          <div class="lane-options">
+            <label class="lane-check"><input type="checkbox" name="lane" value="TPEB" checked> TPEB <span class="lane-sub">Trans-Pacific EB</span></label>
+            <label class="lane-check"><input type="checkbox" name="lane" value="FEWB"> FEWB <span class="lane-sub">Far East WB</span></label>
+          </div>
+        </div>
+        <textarea id="extra-context" placeholder="Optional: add context for this run (market moves, news, call notes…)" rows="3"></textarea>
+        <button id="run-btn" class="btn-primary" onclick="triggerRun()">
+          <span id="run-btn-text">Generate ICC Briefing</span>
+        </button>
+        <div id="run-status" class="run-status hidden"></div>
+      </section>
+
+      <!-- Signal intake -->
+      <section class="panel">
+        <h2 class="panel-title">Submit Signal</h2>
+        <p class="panel-desc">Add qualitative intel — carrier indications, competitor rates, market reads — to inform the next run.</p>
+        <input id="sig-author" type="text" placeholder="Your name / team" />
+        <textarea id="sig-text" placeholder="Signal text (e.g. 'Maersk holding rates firm, no April GRI expected')" rows="3"></textarea>
+        <input id="sig-tags" type="text" placeholder="Tags (comma-separated, e.g. Maersk, GRI, PSW)" />
+        <button class="btn-secondary" onclick="submitSignal()">Add Signal</button>
+        <div id="sig-status" class="run-status hidden"></div>
+      </section>
+
+      <!-- Recent signals -->
+      <section class="panel">
+        <h2 class="panel-title">Recent Signals <span class="count-badge" id="sig-count">{{ signals|length }}</span></h2>
+        <div id="signals-list">
+          {% for s in signals[:8] %}
+          <div class="signal-item">
+            <div class="signal-meta">{{ s.author }} &middot; {{ s.timestamp[:10] }}</div>
+            <div class="signal-text">{{ s.text }}</div>
+            {% if s.tags %}
+            <div class="signal-tags">
+              {% for t in s.tags %}<span class="tag">{{ t }}</span>{% endfor %}
+            </div>
+            {% endif %}
+          </div>
+          {% else %}
+          <p class="empty-state">No signals yet. Submit one above.</p>
+          {% endfor %}
+        </div>
+      </section>
+
+    </aside>
+
+    <!-- Right panel: latest briefing + history -->
+    <div class="main-content">
+
+      {% if latest %}
+      <!-- Latest briefing preview -->
+      <section class="panel briefing-panel">
+        <div class="briefing-header">
+          <div>
+            <h2 class="panel-title">Latest Briefing</h2>
+            <div class="briefing-meta">
+              Run #{{ latest.id }} &middot; {{ latest.generated_at }} &middot;
+              {% if latest.used_claude %}
+                <span class="badge-ok">Claude</span>
+              {% else %}
+                <span class="badge-warn">Fallback</span>
+              {% endif %}
+              &middot; Trigger: {{ latest.trigger }}
+            </div>
+          </div>
+          <a href="/run/{{ latest.id }}" class="btn-outline">View Full Briefing</a>
+        </div>
+        <div class="briefing-preview markdown-body" id="briefing-preview"
+             data-raw="{{ latest.content[:1800] | e }}"></div>
+        <a href="/run/{{ latest.id }}" class="read-more-link">Read full briefing &rarr;</a>
+      </section>
+      {% else %}
+      <section class="panel empty-panel">
+        <div class="empty-hero">
+          <div class="empty-icon">&#9741;</div>
+          <h2>No briefings yet</h2>
+          <p>Click <strong>Generate ICC Briefing</strong> to run the agent for the first time.</p>
+        </div>
+      </section>
+      {% endif %}
+
+      <!-- Signal coverage -->
+      <section class="panel">
+        <h2 class="panel-title">Signal Coverage &mdash; V1 Scope</h2>
+        <table class="coverage-table">
+          <thead>
+            <tr><th>Signal</th><th>Lanes</th><th>Source</th><th>Phase 0 Status</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Weighted buy (FAK/contracted)</td><td>TPEB + FEWB</td><td>Snowflake / Cost Library</td><td><span class="badge-seed">Local Seed</span></td></tr>
+            <tr><td>Volume allocation by carrier</td><td>TPEB + FEWB</td><td>Looker / Snowflake</td><td><span class="badge-seed">Local Seed</span></td></tr>
+            <tr><td>SCFI / Drewry WCI index</td><td>TPEB + FEWB</td><td>Web search</td><td><span class="badge-web">Web Fallback</span></td></tr>
+            <tr><td>Europe shipping news</td><td>FEWB</td><td>Web search</td><td><span class="badge-web">Web Fallback</span></td></tr>
+            <tr><td>CMA CGM / Hapag-Lloyd GRI</td><td>FEWB</td><td>Web search</td><td><span class="badge-web">Web Fallback</span></td></tr>
+            <tr><td>Carrier GRI announcements</td><td>TPEB + FEWB</td><td>Web search + Slack</td><td><span class="badge-web">Web Fallback</span></td></tr>
+            <tr><td>Indicative costs (WhatsApp)</td><td>TPEB + FEWB</td><td>Signal intake form</td><td><span class="badge-ok">Live (manual)</span></td></tr>
+            <tr><td>Customer competitor rates</td><td>TPEB + FEWB</td><td>Signal intake form</td><td><span class="badge-ok">Live (manual)</span></td></tr>
+            <tr><td>Xeneta rate percentiles</td><td>TPEB + FEWB</td><td>Xeneta API</td><td><span class="badge-phase">Phase 1</span></td></tr>
+            <tr><td>Booking intake / cancellations</td><td>TPEB + FEWB</td><td>Snowflake</td><td><span class="badge-phase">Phase 1</span></td></tr>
+            <tr><td>GRI historical success rate</td><td>TPEB + FEWB</td><td>Structured history</td><td><span class="badge-phase2">Phase 2</span></td></tr>
+            <tr><td>Blank sailings / capacity</td><td>TPEB + FEWB</td><td>Snowflake / Web</td><td><span class="badge-phase2">Phase 2</span></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- Run history -->
+      {% if runs|length > 1 %}
+      <section class="panel">
+        <h2 class="panel-title">Run History</h2>
+        <table class="history-table">
+          <thead>
+            <tr><th>#</th><th>Generated</th><th>Trigger</th><th>Signals</th><th>Model</th><th></th></tr>
+          </thead>
+          <tbody>
+            {% for r in runs %}
+            <tr>
+              <td>#{{ r.id }}</td>
+              <td>{{ r.generated_at }}</td>
+              <td>{{ r.trigger }}</td>
+              <td>
+                Internal: {{ r.signal_summary.get('internal_ok', 0) }}/2 &middot;
+                Web: {{ r.signal_summary.get('web_ok', 0) }}/{{ r.signal_summary.get('web_ok', 0) + r.signal_summary.get('web_failed', 0) }} &middot;
+                Qual: {{ r.signal_summary.get('qualitative_count', 0) }}
+              </td>
+              <td>{% if r.used_claude %}<span class="badge-ok">Claude</span>{% else %}<span class="badge-warn">Fallback</span>{% endif %}</td>
+              <td><a href="/run/{{ r.id }}" class="btn-sm">View</a></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </section>
+      {% endif %}
+
+    </div>
+  </main>
+
+  <script src="/static/js/briefing.js"></script>
+  <script src="/static/js/dashboard.js"></script>
+  <script>
+    // Render markdown preview on load
+    const preview = document.getElementById('briefing-preview');
+    if (preview && preview.dataset.raw) {
+      preview.innerHTML = renderMarkdown(preview.dataset.raw);
+    }
+  </script>
+</body>
+</html>

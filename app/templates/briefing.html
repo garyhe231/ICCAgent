@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ICC Briefing #{{ run.id }} — TPEB</title>
+  <link rel="stylesheet" href="/static/css/style.css" />
+</head>
+<body>
+  <header class="top-bar">
+    <div class="top-bar-inner">
+      <div class="brand">
+        <a href="/" class="back-link">&larr; Dashboard</a>
+        <span class="brand-label">ICC Briefing #{{ run.id }}</span>
+        <span class="brand-lane">{{ run.trade_lane }} &mdash; {{ run.generated_at }}</span>
+      </div>
+      <div class="top-bar-meta">
+        {% if run.used_claude %}
+          <span class="badge-ok">Claude</span>
+        {% else %}
+          <span class="badge-warn">Fallback mode</span>
+        {% endif %}
+        <span class="phase-badge">Trigger: {{ run.trigger }}</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="briefing-main">
+    <div class="briefing-doc">
+
+      <!-- Signal summary bar -->
+      <div class="signal-bar">
+        <span class="signal-bar-item">
+          <strong>Internal signals:</strong> {{ run.signal_summary.get('internal_ok', 0) }}/2
+          <span class="badge-seed">local seed</span>
+        </span>
+        <span class="signal-bar-item">
+          <strong>Web signals:</strong>
+          {{ run.signal_summary.get('web_ok', 0) }} ok /
+          {{ run.signal_summary.get('web_failed', 0) }} failed
+          <span class="badge-web">web fallback</span>
+        </span>
+        <span class="signal-bar-item">
+          <strong>Qualitative:</strong> {{ run.signal_summary.get('qualitative_count', 0) }}
+          <span class="badge-ok">live</span>
+        </span>
+      </div>
+
+      {% if run.error %}
+      <div class="error-banner">
+        <strong>Warning:</strong> {{ run.error }}
+      </div>
+      {% endif %}
+
+      <!-- ICC Range Summary Card -->
+      {% if run.icc_ranges %}
+      <div class="icc-summary-card">
+        <div class="icc-summary-header">
+          <div class="icc-summary-title">Recommended ICC — {{ run.trade_lane }} FAK 40ft</div>
+          <div class="icc-summary-date">{{ run.generated_at }}</div>
+        </div>
+        <div class="icc-grid">
+          {% for r in run.icc_ranges %}
+          <div class="icc-cell conf-{{ r.confidence | lower }}">
+            <div class="icc-cell-lane">{{ r.origin }} &rarr; {{ r.destination }}</div>
+            <div class="icc-cell-range">{{ r.range_str }}</div>
+            <div class="icc-cell-unit">per 40ft</div>
+            <div class="icc-cell-conf conf-badge-{{ r.confidence | lower }}">{{ r.confidence }}</div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Full briefing content -->
+      <div class="markdown-body full-briefing" id="briefing-content">
+        {{ run.content }}
+      </div>
+
+    </div>
+  </main>
+
+  <script src="/static/js/briefing.js"></script>
+</body>
+</html>
