@@ -13,6 +13,25 @@ from app.config import OUTPUT_DIR
 
 _runs: list[dict] = []
 
+
+def _load_runs_from_disk() -> None:
+    """Load all persisted runs from OUTPUT_DIR on startup, newest first."""
+    if not os.path.isdir(OUTPUT_DIR):
+        return
+    files = sorted(
+        [f for f in os.listdir(OUTPUT_DIR) if f.startswith("icc_briefing_") and f.endswith(".json")],
+        reverse=True,
+    )
+    for fname in files:
+        try:
+            with open(os.path.join(OUTPUT_DIR, fname)) as f:
+                record = json.load(f)
+            # Re-parse icc_ranges in case regex has been updated
+            record["icc_ranges"] = _parse_icc_ranges(record.get("content", ""))
+            _runs.append(record)
+        except Exception:
+            pass
+
 # Port pair labels in the order they appear in the briefing (all supported lanes)
 _PORT_PAIR_PATTERNS = [
     ("China Base Ports", "PSW"),
@@ -45,7 +64,7 @@ def _parse_icc_ranges(content: str) -> list:
     for origin, dest in _PORT_PAIR_PATTERNS:
         # Match headings like "### China Base Ports → PSW" (unicode → or ASCII ->)
         heading_pat = re.compile(
-            rf"#+ *{origin}[\s\u2192\->/]+{dest}",
+            rf"#+ *[^\w]*{origin}[\s\u2192\->/]+{dest}",
             re.IGNORECASE,
         )
         m = heading_pat.search(content)
@@ -123,3 +142,7 @@ def get_run(run_id: int) -> Optional[dict]:
         if r["id"] == run_id:
             return r
     return None
+
+
+# Load persisted runs on module import
+_load_runs_from_disk()
