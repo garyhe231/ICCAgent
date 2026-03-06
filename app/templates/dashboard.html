@@ -30,9 +30,15 @@
         <p class="panel-desc">Trigger a fresh ICC analysis. The agent will ingest all available signals and produce a briefing document.</p>
         <div class="lane-selector">
           <label class="lane-label">Trade Lanes</label>
-          <div class="lane-options">
-            <label class="lane-check"><input type="checkbox" name="lane" value="TPEB" checked> TPEB <span class="lane-sub">Trans-Pacific EB</span></label>
-            <label class="lane-check"><input type="checkbox" name="lane" value="FEWB"> FEWB <span class="lane-sub">Far East WB</span></label>
+          <div class="lane-dropdown-wrap" id="lane-dropdown-wrap">
+            <button type="button" class="lane-dropdown-btn" id="lane-dropdown-btn" onclick="toggleLaneDropdown()">
+              <span id="lane-dropdown-label">TPEB — Trans-Pacific EB</span>
+              <span class="lane-dropdown-arrow">&#9660;</span>
+            </button>
+            <div class="lane-dropdown-menu" id="lane-dropdown-menu">
+              <label class="lane-option"><input type="checkbox" name="lane" value="TPEB" checked onchange="updateLaneLabel()"> <strong>TPEB</strong> <span class="lane-sub">Trans-Pacific Eastbound</span><div class="lane-ports">China / SEA &rarr; PSW, PNW, EC, Gulf</div></label>
+              <label class="lane-option"><input type="checkbox" name="lane" value="FEWB" onchange="updateLaneLabel()"> <strong>FEWB</strong> <span class="lane-sub">Far East Westbound</span><div class="lane-ports">China / SEA / NEA &rarr; North Europe, Med</div></label>
+            </div>
           </div>
         </div>
         <textarea id="extra-context" placeholder="Optional: add context for this run (market moves, news, call notes…)" rows="3"></textarea>

@@ -1,5 +1,33 @@
 /* ICC AI Agent — Dashboard JS */
 
+function toggleLaneDropdown() {
+  const menu = document.getElementById('lane-dropdown-menu');
+  const btn = document.getElementById('lane-dropdown-btn');
+  const open = menu.classList.toggle('open');
+  btn.classList.toggle('open', open);
+}
+
+function updateLaneLabel() {
+  const checked = Array.from(document.querySelectorAll('input[name="lane"]:checked'));
+  const label = document.getElementById('lane-dropdown-label');
+  if (checked.length === 0) {
+    label.textContent = 'Select trade lanes…';
+  } else {
+    const names = { TPEB: 'Trans-Pacific EB', FEWB: 'Far East WB' };
+    label.textContent = checked.map(el => `${el.value} — ${names[el.value]}`).join(', ');
+  }
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', (e) => {
+  const wrap = document.getElementById('lane-dropdown-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    document.getElementById('lane-dropdown-menu')?.classList.remove('open');
+    document.getElementById('lane-dropdown-btn')?.classList.remove('open');
+  }
+});
+
+
 async function triggerRun() {
   const btn = document.getElementById('run-btn');
   const btnText = document.getElementById('run-btn-text');
